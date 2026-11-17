@@ -3,6 +3,28 @@
 display:none;
 }
 
+.sort-header {
+  background: none;
+  border: none;
+  padding: 0;
+  font: inherit;
+  font-weight: bold;
+  color: inherit;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.sort-header:hover,
+.sort-header:focus-visible {
+  text-decoration: underline;
+}
+
+.sort-indicator {
+  margin-left: 4px;
+  opacity: 0.6;
+  font-size: 0.85em;
+}
+
 #nameGroup {
   display: flex;
   align-items: center;

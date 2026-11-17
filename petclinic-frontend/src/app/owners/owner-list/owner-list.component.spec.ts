@@ -139,4 +139,59 @@ describe('OwnerListComponent', () => {
     expect(component.owners).toEqual([testOwner]);
   });
 
+  describe('sorting', () => {
+    const davis: Owner = {...testOwner, id: 2, firstName: 'Betty', lastName: 'Davis', city: 'Sun Prairie'};
+    const davisHarold: Owner = {...testOwner, id: 3, firstName: 'Harold', lastName: 'davis', city: 'Windsor'};
+    const black: Owner = {...testOwner, id: 4, firstName: 'Jeff', lastName: 'Black', city: 'Monona'};
+
+    beforeEach(() => {
+      getOwnersSpy.and.returnValue(of([testOwner, davisHarold, black, davis]));
+      fixture.detectChanges();
+    });
+
+    const ids = () => component.sortedOwners.map(o => o.id);
+
+    it('keeps the server order until a column is chosen', () => {
+      expect(ids()).toEqual([1, 3, 4, 2]);
+    });
+
+    it('sorts by last name, then first name, ignoring case', () => {
+      component.sortBy('name');
+      expect(ids()).toEqual([4, 2, 3, 1]);
+    });
+
+    it('clicking the same column again reverses the order', () => {
+      component.sortBy('name');
+      component.sortBy('name');
+      expect(ids()).toEqual([1, 3, 2, 4]);
+      expect(component.ariaSort('name')).toBe('descending');
+    });
+
+    it('a new column starts ascending', () => {
+      component.sortBy('name');
+      component.sortBy('name');
+      component.sortBy('city');
+      expect(component.sortAscending).toBe(true);
+      expect(ids()).toEqual([1, 4, 2, 3]);
+      expect(component.ariaSort('name')).toBe('none');
+    });
+
+    it('clicking a header sorts the rendered rows', () => {
+      fixture.detectChanges();
+      fixture.debugElement.query(By.css('[data-sort="name"]')).nativeElement.click();
+      fixture.detectChanges();
+
+      const names = fixture.debugElement.queryAll(By.css('.ownerFullName'))
+        .map(cell => cell.nativeElement.innerText);
+      expect(names).toEqual(['Jeff Black', 'Betty Davis', 'Harold davis', 'George Franklin']);
+    });
+
+    it('the sort survives a new search', () => {
+      component.sortBy('name');
+      searchOwnersSpy.and.returnValue(of([testOwner, black]));
+      component.searchByLastName('x');
+      expect(ids()).toEqual([4, 1]);
+    });
+  });
+
 });

@@ -27,16 +27,19 @@
       <table class="table table-striped">
         <thead>
         <tr>
-          <th>Name</th>
-          <th>Address</th>
-          <th>City</th>
-          <th>Telephone</th>
+          <th *ngFor="let col of sortableColumns" [attr.aria-sort]="ariaSort(col.key)">
+            <button type="button" class="sort-header" [attr.data-sort]="col.key" (click)="sortBy(col.key)">
+              {{ col.label }}
+              <span class="sort-indicator" aria-hidden="true">{{
+                sortColumn !== col.key ? '↕' : (sortAscending ? '▲' : '▼') }}</span>
+            </button>
+          </th>
           <th>Pets</th>
         </tr>
         </thead>
 
         <tbody>
-        <tr *ngFor="let owner of owners">
+        <tr *ngFor="let owner of sortedOwners">
           <td class="ownerFullName"><a routerLink="/owners/{{owner.id}}" routerLinkActive="active"
             (click)="onSelect(owner)">{{ owner.firstName }} {{ owner.lastName }}</a></td>
           <td>{{ owner.address }}</td>
